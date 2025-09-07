@@ -15,6 +15,7 @@
   const livesEl = $('#lives');
   const levelEl = $('#level');
   const pauseBtn = $('#pauseBtn');
+  const resumeBtn = $('#resumeBtn');
   const muteBtn = $('#muteBtn');
   const speedBtn = $('#speedBtn');
   const startBtn = $('#startBtn');
@@ -184,7 +185,9 @@
     if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
     if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
     if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') keys.fire = true;
-    if (e.key.toLowerCase() === 'p') togglePause();
+    if (e.key.toLowerCase() === 'p' && !state.gameOver) {
+      if (state.playing) pauseGame(); else resumeGame();
+    }
     if (e.key.toLowerCase() === 'm') { muted = !muted; localStorage.setItem('invaders_muted', JSON.stringify(muted)); setMuteUI(); }
   });
   window.addEventListener('keyup', (e) => {
@@ -207,13 +210,19 @@
   });
   touch.addEventListener('pointercancel', () => state.touch = {left:false,right:false,fire:false});
 
-  pauseBtn.addEventListener('click', () => togglePause());
+  pauseBtn.addEventListener('click', () => {
+    if (state.gameOver) {
+      resetGame();
+      resumeGame();
+    } else {
+      pauseGame();
+    }
+  });
+  resumeBtn.addEventListener('click', () => resumeGame());
   startBtn.addEventListener('click', () => {
     resetGame();
-    state.playing = true;
     startBtn.classList.add('hide');
-    pauseBtn.classList.remove('hide');
-    pauseBtn.textContent = 'Pause';
+    resumeGame();
   });
   muteBtn.addEventListener('click', () => { muted = !muted; localStorage.setItem('invaders_muted', JSON.stringify(muted)); setMuteUI(); });
 
@@ -231,10 +240,17 @@
     speedBtn.textContent = 'Speed: ' + speedModes[speedIndex].label;
   });
 
-  function togglePause() {
-    if (state.gameOver) { resetGame(); return; }
-    state.playing = !state.playing;
-    pauseBtn.textContent = state.playing ? 'Pause' : 'Resume';
+  function pauseGame() {
+    state.playing = false;
+    pauseBtn.classList.add('hide');
+    resumeBtn.classList.remove('hide');
+  }
+
+  function resumeGame() {
+    state.playing = true;
+    resumeBtn.classList.add('hide');
+    pauseBtn.classList.remove('hide');
+    pauseBtn.textContent = 'Pause';
   }
 
   // Shooting
@@ -285,6 +301,7 @@
   resetGame();
   state.playing = false;
   pauseBtn.classList.add('hide');
+  resumeBtn.classList.add('hide');
 
   // Main loop
   let last = 0;
@@ -404,6 +421,8 @@
           if (state.lives <= 0) {
             state.gameOver = true; state.playing = false;
             pauseBtn.textContent = 'Restart';
+            pauseBtn.classList.remove('hide');
+            resumeBtn.classList.add('hide');
             if (state.score > state.hiScore) {
               state.hiScore = state.score;
               localStorage.setItem('invaders_hi', state.hiScore);
@@ -420,6 +439,8 @@
         state.lives = 0; livesEl.textContent = state.lives;
         state.gameOver = true; state.playing = false;
         pauseBtn.textContent = 'Restart';
+        pauseBtn.classList.remove('hide');
+        resumeBtn.classList.add('hide');
         beep(100,.2,'square',.08);
         break;
       }
@@ -496,7 +517,7 @@
     // overlays
     if (state.gameOver) {
       drawCenterText('GAME OVER', 56, '#fca5a5');
-      drawCenterText('Press R / Tap Resume to restart', 20, '#e2e8f0', 60);
+      drawCenterText('Press R or tap Restart to play again', 20, '#e2e8f0', 60);
     } else if (!state.playing) {
       drawCenterText('PAUSED', 56, '#93c5fd');
       drawCenterText('Press P or tap Resume', 20, '#e2e8f0', 60);
@@ -517,7 +538,10 @@
 
   // Restart hotkey
   window.addEventListener('keydown', (e) => {
-    if (e.key.toLowerCase() === 'r') { resetGame(); state.playing = true; pauseBtn.textContent = 'Pause'; }
+    if (e.key.toLowerCase() === 'r') {
+      resetGame();
+      resumeGame();
+    }
   });
 
 })();
