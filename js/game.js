@@ -57,7 +57,8 @@
     particles: [],
     enemyDir: 1,
     enemyStepTimer: 0,
-    enemySpeed: 40, // lower is faster (ms per step)
+    enemySpeed: 80, // lower is faster (ms per step)
+
     enemyDrop: 16,
     enemyLeft: 60,
     enemyRight: W-60,
@@ -67,7 +68,9 @@
 
   // Entities
   const player = {
-    x: W/2, y: H-80, w: 48, h: 20, speed: 4, inv: 0, tri: 0
+
+    x: W/2, y: H-80, w: 48, h: 20, speed: 3, inv: 0, tri: 0
+
   };
 
   function rect(a,b) {
@@ -102,7 +105,9 @@
         });
       }
     }
-    state.enemySpeed = Math.max(18, 46 - level*2);
+
+    state.enemySpeed = Math.max(30, 70 - level*3);
+
     state.enemyDir = 1;
     state.enemyLeft = 60;
     state.enemyRight = W-60;
@@ -212,18 +217,22 @@
   function fireBullet() {
     if (state.cooldown > 0) return;
     const bx = player.x + player.w/2 - 2, by = player.y - 14;
-    const bullets = [{x:bx, y:by, w:4, h:14, vy:-8, enemy:false}];
+
+    const bullets = [{x:bx, y:by, w:4, h:14, vy:-6, enemy:false}];
     if (player.tri>0) {
-      bullets.push({x:bx-14, y:by, w:4, h:14, vy:-8, vx:-1.8, enemy:false});
-      bullets.push({x:bx+14, y:by, w:4, h:14, vy:-8, vx:1.8, enemy:false});
+      bullets.push({x:bx-14, y:by, w:4, h:14, vy:-6, vx:-1.8, enemy:false});
+      bullets.push({x:bx+14, y:by, w:4, h:14, vy:-6, vx:1.8, enemy:false});
     }
     state.bullets.push(...bullets);
-    state.cooldown = player.tri>0 ? 14 : 18;
+    state.cooldown = player.tri>0 ? 20 : 24;
+
     beep(880, .05, 'square', .04);
   }
 
   function enemyShoot(e) {
-    state.eBullets.push({x:e.x+e.w/2-2, y:e.y+e.h, w:4, h:14, vy: 4 + Math.random()*1.2, enemy:true});
+
+    state.eBullets.push({x:e.x+e.w/2-2, y:e.y+e.h, w:4, h:14, vy: 3 + Math.random()*1, enemy:true});
+
   }
 
   // Powerups
@@ -231,7 +240,9 @@
     if (Math.random() < 0.12) {
       const kinds = ['life','tri','shield'];
       const kind = kinds[Math.floor(Math.random()*kinds.length)];
-      state.powerups.push({x:ex, y:ey, w:18, h:18, vy:1.5, kind});
+
+      state.powerups.push({x:ex, y:ey, w:18, h:18, vy:1, kind});
+
     }
   }
 
@@ -297,7 +308,9 @@
         e.anim ^= 1;
         if (e.x < state.enemyLeft || e.x + e.w > state.enemyRight) hitEdge = true;
         // chance to shoot
-        if (Math.random() < 0.015 + state.level*0.0015) enemyShoot(e);
+
+    if (Math.random() < 0.01 + state.level*0.001) enemyShoot(e);
+
       }
       if (hitEdge) {
         for (const e of state.enemies) e.y += state.enemyDrop;

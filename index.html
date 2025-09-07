@@ -40,10 +40,15 @@
     }
     .brand img { width: 28px; height: 28px; }
     .hud {
-      display: inline-flex; flex-wrap: wrap; gap: 16px; align-items: center; row-gap: 6px;
+      display: inline-flex; flex-wrap: wrap; gap: 16px; row-gap: 6px;
+      align-items: center; justify-content: center;
       font-weight: 600;
       background: rgba(255,255,255,.05);
       padding: 6px 10px; border-radius: 999px; backdrop-filter: blur(6px);
+    }
+    @media (max-width: 600px) {
+      header { justify-content: center; }
+      header .brand, header .hud { flex: 1 1 100%; justify-content: center; }
     }
     .btn {
       background: linear-gradient(135deg, var(--accent), var(--accent2));
