@@ -42,6 +42,10 @@
   const setMuteUI = () => muteBtn.textContent = muted ? '🔇' : '🔊';
   setMuteUI();
 
+  const bgMusic = new Audio('bgmusic.mp3');
+  bgMusic.loop = true;
+  bgMusic.volume = 0.3;
+
   function beep(freq=440, dur=0.06, type='square', vol=0.05) {
     if (muted) return;
     try {
@@ -85,6 +89,15 @@
     speed: 0.1,
   };
 
+  const updateBgMusic = () => {
+    if (muted || !state.playing) {
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    } else {
+      bgMusic.play().catch(() => {});
+    }
+  };
+
   // Entities
   const player = {
 
@@ -113,6 +126,7 @@
   function showGameOver() {
     finalScoreEl.textContent = state.score;
     gameOverModal.classList.remove('hide');
+    updateBgMusic();
   }
 
   function hideGameOver() {
@@ -292,7 +306,7 @@
   playerNameInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitNameBtn.click(); });
 
   dismissScoreBtn.addEventListener('click', () => hideGameOver());
-  muteBtn.addEventListener('click', () => { muted = !muted; localStorage.setItem('invaders_muted', JSON.stringify(muted)); setMuteUI(); });
+  muteBtn.addEventListener('click', () => { muted = !muted; localStorage.setItem('invaders_muted', JSON.stringify(muted)); setMuteUI(); updateBgMusic(); });
 
   const speedModes = [
     {label:'Slow', value:0.1},
@@ -312,6 +326,7 @@
     state.playing = false;
     pauseBtn.classList.add('hide');
     resumeBtn.classList.remove('hide');
+    updateBgMusic();
   }
 
   function resumeGame() {
@@ -319,6 +334,7 @@
     resumeBtn.classList.add('hide');
     pauseBtn.classList.remove('hide');
     pauseBtn.textContent = 'Pause';
+    updateBgMusic();
   }
 
   // Shooting

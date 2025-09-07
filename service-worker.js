@@ -1,12 +1,13 @@
 /* Basic cache-first service worker for offline play */
-const CACHE = 'invaders-cache-v1';
+const CACHE = 'invaders-cache-v2';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icons/192.png',
   './icons/512.png',
-  './js/game.js'
+  './js/game.js',
+  './bgmusic.mp3'
 ];
 
 self.addEventListener('install', (e) => {
