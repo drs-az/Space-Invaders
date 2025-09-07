@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Space Invaders PWA</title>
+  <meta name="theme-color" content="#0b1021" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/192.png" />
+  <style>
+    :root {
+      --bg: #0b1021;
+      --fg: #e2e8f0;
+      --accent: #7dd3fc;
+      --accent2: #a78bfa;
+      --warn: #fca5a5;
+      --pad: 12px;
+      --radius: 14px;
+    }
+    html, body {
+      margin: 0; padding: 0;
+      background: radial-gradient(1200px 800px at 50% 20%, #121738 0%, #0b1021 60%, #060913 100%);
+      color: var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      height: 100%;
+      overflow: hidden;
+    }
+    header {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: var(--pad) calc(var(--pad) * 1.5);
+      background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,0));
+      z-index: 5;
+      user-select: none;
+    }
+    .brand {
+      display: inline-flex; align-items: center; gap: 10px;
+      letter-spacing: .8px; font-weight: 700;
+    }
+    .brand img { width: 28px; height: 28px; }
+    .hud {
+      display: inline-flex; gap: 16px; align-items: center;
+      font-weight: 600;
+      background: rgba(255,255,255,.05);
+      padding: 6px 10px; border-radius: 999px; backdrop-filter: blur(6px);
+    }
+    .btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #0b1021; font-weight: 800;
+      border: none; padding: 8px 12px; border-radius: 999px; cursor: pointer;
+      box-shadow: 0 6px 18px rgba(124, 58, 237, .25), inset 0 0 0 1px rgba(0,0,0,.2);
+    }
+    .btn.secondary {
+      background: rgba(255,255,255,.08); color: var(--fg);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.15);
+    }
+    #gameWrap {
+      position: fixed; inset: 0; display: grid; place-items: center;
+    }
+    canvas {
+      background: transparent;
+      width: min(100vw, 900px);
+      height: calc(min(100vw, 900px) * 1.5 / 1);
+      max-height: 90vh;
+      touch-action: none;
+      border-radius: var(--radius);
+      box-shadow: 0 30px 80px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.04);
+    }
+    #touch {
+      position: fixed; bottom: 10px; left: 0; right: 0;
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+      padding: 0 12px 8px;
+      z-index: 10;
+    }
+    .touch-btn {
+      padding: 14px; border-radius: 12px;
+      background: rgba(255,255,255,.06);
+      text-align: center; font-weight: 700; letter-spacing: .8px;
+      user-select: none; -webkit-user-select: none;
+      touch-action: none;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    .hide { display: none !important; }
+    #help {
+      position: fixed; top: 56px; right: 16px; max-width: 360px;
+      background: rgba(15,23,42,.7); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px; padding: 12px; font-size: .95rem; line-height: 1.35;
+      backdrop-filter: blur(8px);
+    }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="icons/192.png" alt="logo" />
+      <div>Space Invaders</div>
+    </div>
+    <div class="hud">
+      <div>Score: <span id="score">0</span></div>
+      <div>Lives: <span id="lives">3</span></div>
+      <div>Level: <span id="level">1</span></div>
+      <button class="btn secondary" id="muteBtn" aria-label="Toggle sound">🔊</button>
+      <button class="btn" id="pauseBtn">Pause</button>
+    </div>
+  </header>
+
+  <div id="help">
+    Controls: ← → to move, Space/▲ to shoot, P to pause. On mobile, use the on‑screen controls.<br/>
+    Tip: Clear waves fast for bonus points. Power‑ups appear randomly.
+  </div>
+
+  <div id="gameWrap">
+    <canvas id="game" width="600" height="900" aria-label="Space Invaders game canvas"></canvas>
+  </div>
+
+  <div id="touch" class="hide" aria-hidden="true">
+    <div class="touch-btn" data-action="left">◀︎</div>
+    <div class="touch-btn" data-action="fire">▲</div>
+    <div class="touch-btn" data-action="right">▶︎</div>
+  </div>
+
+  <script>
+    // Show touch controls on small screens
+    const touch = document.getElementById('touch');
+    const showTouch = () => {
+      if (window.innerWidth < 760 || window.innerHeight < 760) touch.classList.remove('hide');
+      else touch.classList.add('hide');
+    };
+    window.addEventListener('resize', showTouch); showTouch();
+  </script>
+  <script src="js/game.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js');
+      });
+    }
+  </script>
+</body>
+</html>
