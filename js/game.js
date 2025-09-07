@@ -45,6 +45,7 @@
   // Game state
   const state = {
     playing: false,
+    started: false,
     level: 1,
     score: 0,
     lives: 3,
@@ -222,6 +223,7 @@
   startBtn.addEventListener('click', () => {
     resetGame();
     startBtn.classList.add('hide');
+    state.started = true;
     resumeGame();
   });
   muteBtn.addEventListener('click', () => { muted = !muted; localStorage.setItem('invaders_muted', JSON.stringify(muted)); setMuteUI(); });
@@ -519,8 +521,13 @@
       drawCenterText('GAME OVER', 56, '#fca5a5');
       drawCenterText('Tap Restart to play again', 20, '#e2e8f0', 60);
     } else if (!state.playing) {
-      drawCenterText('PAUSED', 56, '#93c5fd');
-      drawCenterText('Tap Resume', 20, '#e2e8f0', 60);
+      if (!state.started) {
+        drawCenterText('Welcome to Space Invaders', 32, '#93c5fd');
+        drawCenterText('Tap Start', 20, '#e2e8f0', 60);
+      } else {
+        drawCenterText('PAUSED', 56, '#93c5fd');
+        drawCenterText('Tap Resume', 20, '#e2e8f0', 60);
+      }
     } else {
       // UI: hi score
       ctx.fillStyle = 'rgba(255,255,255,.5)';
@@ -543,5 +550,4 @@
       resumeGame();
     }
   });
-
 })();
