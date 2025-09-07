@@ -71,7 +71,7 @@
   // Entities
   const player = {
 
-    x: W/2, y: H-80, w: 48, h: 20, speed: 5, inv: 0, tri: 0
+    x: W/2, y: H-80, w: 48, h: 20, speed: 12, inv: 0, tri: 0
 
   };
 
@@ -234,10 +234,11 @@
     if (state.cooldown > 0) return;
     const bx = player.x + player.w/2 - 2, by = player.y - 14;
 
-    const bullets = [{x:bx, y:by, w:4, h:14, vy:-9, enemy:false}];
+    const bullets = [{x:bx, y:by, w:4, h:14, vy:-60, enemy:false}];
     if (player.tri>0) {
-      bullets.push({x:bx-14, y:by, w:4, h:14, vy:-9, vx:-2.7, enemy:false});
-      bullets.push({x:bx+14, y:by, w:4, h:14, vy:-9, vx:2.7, enemy:false});
+      bullets.push({x:bx-14, y:by, w:4, h:14, vy:-60, vx:-18, enemy:false});
+      bullets.push({x:bx+14, y:by, w:4, h:14, vy:-60, vx:18, enemy:false});
+
     }
     state.bullets.push(...bullets);
     state.cooldown = player.tri>0 ? 10 : 12;
