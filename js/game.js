@@ -16,6 +16,7 @@
   const levelEl = $('#level');
   const pauseBtn = $('#pauseBtn');
   const muteBtn = $('#muteBtn');
+  const speedBtn = $('#speedBtn');
 
   // Dimensions (virtual fixed), canvas is scaled by CSS
   const W = canvas.width, H = canvas.height;
@@ -64,6 +65,7 @@
     enemyRight: W-60,
     waveCleared: false,
     gameOver: false,
+    speed: 0.25,
   };
 
   // Entities
@@ -207,6 +209,19 @@
   pauseBtn.addEventListener('click', () => togglePause());
   muteBtn.addEventListener('click', () => { muted = !muted; localStorage.setItem('invaders_muted', JSON.stringify(muted)); setMuteUI(); });
 
+  const speedModes = [
+    {label:'Slow', value:0.25},
+    {label:'Fast', value:0.5},
+  ];
+  let speedIndex = 0;
+  state.speed = speedModes[speedIndex].value;
+  speedBtn.textContent = 'Speed: ' + speedModes[speedIndex].label;
+  speedBtn.addEventListener('click', () => {
+    speedIndex = (speedIndex + 1) % speedModes.length;
+    state.speed = speedModes[speedIndex].value;
+    speedBtn.textContent = 'Speed: ' + speedModes[speedIndex].label;
+  });
+
   function togglePause() {
     if (state.gameOver) { resetGame(); return; }
     state.playing = !state.playing;
@@ -273,15 +288,15 @@
 
   function update(dt) {
     // cooldowns
-    if (state.cooldown>0) state.cooldown -= 1;
-    if (player.inv>0) player.inv -= 1;
-    if (player.tri>0) player.tri -= 1;
+    if (state.cooldown>0) state.cooldown -= state.speed;
+    if (player.inv>0) player.inv -= state.speed;
+    if (player.tri>0) player.tri -= state.speed;
 
     // player move
     const movingLeft = keys.left || state.touch.left;
     const movingRight = keys.right || state.touch.right;
-    if (movingLeft) player.x -= player.speed;
-    if (movingRight) player.x += player.speed;
+    if (movingLeft) player.x -= player.speed * state.speed;
+    if (movingRight) player.x += player.speed * state.speed;
     player.x = Math.max(6, Math.min(W - player.w - 6, player.x));
 
     // fire
@@ -289,17 +304,17 @@
 
     // bullets
     for (const b of state.bullets) {
-      b.y += b.vy;
-      if (b.vx) b.x += b.vx;
+      b.y += b.vy * state.speed;
+      if (b.vx) b.x += b.vx * state.speed;
     }
     state.bullets = state.bullets.filter(b => b.y + b.h > 0 && b.y < H && b.x>-10 && b.x<W+10);
 
     // enemy bullets
-    for (const b of state.eBullets) b.y += b.vy;
+    for (const b of state.eBullets) b.y += b.vy * state.speed;
     state.eBullets = state.eBullets.filter(b => b.y < H+20);
 
     // enemies step (march)
-    state.enemyStepTimer += dt;
+    state.enemyStepTimer += dt * state.speed;
     if (state.enemyStepTimer >= state.enemySpeed) {
       state.enemyStepTimer = 0;
       let hitEdge = false;
@@ -387,7 +402,7 @@
     }
 
     // powerups
-    for (const p of state.powerups) p.y += p.vy;
+    for (const p of state.powerups) p.y += p.vy * state.speed;
     state.powerups = state.powerups.filter(p => p.y < H+20);
     for (const p of state.powerups) {
       if (rect(p, player)) { applyPowerup(p.kind); p._dead = true; }
@@ -395,7 +410,7 @@
     state.powerups = state.powerups.filter(p => !p._dead);
 
     // particles
-    for (const p of state.particles) { p.x += p.vx; p.y += p.vy; p.life -= 1; }
+    for (const p of state.particles) { p.x += p.vx * state.speed; p.y += p.vy * state.speed; p.life -= state.speed; }
     state.particles = state.particles.filter(p => p.life>0);
 
     // next wave
