@@ -517,10 +517,10 @@
     // overlays
     if (state.gameOver) {
       drawCenterText('GAME OVER', 56, '#fca5a5');
-      drawCenterText('Press R or tap Restart to play again', 20, '#e2e8f0', 60);
+      drawCenterText('Tap Restart to play again', 20, '#e2e8f0', 60);
     } else if (!state.playing) {
       drawCenterText('PAUSED', 56, '#93c5fd');
-      drawCenterText('Press P or tap Resume', 20, '#e2e8f0', 60);
+      drawCenterText('Tap Resume', 20, '#e2e8f0', 60);
     } else {
       // UI: hi score
       ctx.fillStyle = 'rgba(255,255,255,.5)';
