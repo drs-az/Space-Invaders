@@ -132,6 +132,7 @@
       <button class="btn hide" id="pauseBtn">Pause</button>
       <button class="btn hide" id="resumeBtn">Resume</button>
       <button class="btn secondary" id="leaderboardBtn">Leaderboard</button>
+      <button class="btn secondary" id="updateAppBtn">Update App</button>
     </div>
   </header>
 
@@ -237,6 +238,20 @@
         navigator.serviceWorker.register('./service-worker.js');
       });
     }
+  </script>
+  <script>
+    const updateBtn = document.getElementById('updateAppBtn');
+    updateBtn.addEventListener('click', async () => {
+      if ('caches' in window) {
+        const names = await caches.keys();
+        await Promise.all(names.map(name => caches.delete(name)));
+      }
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(reg => reg.update()));
+      }
+      window.location.reload();
+    });
   </script>
 </body>
 </html>
