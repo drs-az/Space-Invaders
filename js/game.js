@@ -17,6 +17,7 @@
   const pauseBtn = $('#pauseBtn');
   const muteBtn = $('#muteBtn');
   const speedBtn = $('#speedBtn');
+  const startBtn = $('#startBtn');
 
   // Dimensions (virtual fixed), canvas is scaled by CSS
   const W = canvas.width, H = canvas.height;
@@ -42,7 +43,7 @@
 
   // Game state
   const state = {
-    playing: true,
+    playing: false,
     level: 1,
     score: 0,
     lives: 3,
@@ -207,6 +208,13 @@
   touch.addEventListener('pointercancel', () => state.touch = {left:false,right:false,fire:false});
 
   pauseBtn.addEventListener('click', () => togglePause());
+  startBtn.addEventListener('click', () => {
+    resetGame();
+    state.playing = true;
+    startBtn.classList.add('hide');
+    pauseBtn.classList.remove('hide');
+    pauseBtn.textContent = 'Pause';
+  });
   muteBtn.addEventListener('click', () => { muted = !muted; localStorage.setItem('invaders_muted', JSON.stringify(muted)); setMuteUI(); });
 
   const speedModes = [
@@ -275,6 +283,8 @@
 
   // Init
   resetGame();
+  state.playing = false;
+  pauseBtn.classList.add('hide');
 
   // Main loop
   let last = 0;
