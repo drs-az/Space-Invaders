@@ -65,7 +65,7 @@
     enemyRight: W-60,
     waveCleared: false,
     gameOver: false,
-    speed: 0.5,
+    speed: 0.1,
   };
 
   // Entities
@@ -210,10 +210,13 @@
   muteBtn.addEventListener('click', () => { muted = !muted; localStorage.setItem('invaders_muted', JSON.stringify(muted)); setMuteUI(); });
 
   const speedModes = [
-    {label:'Slow', value:0.5},
-    {label:'Fast', value:1},
+    {label:'Slow', value:0.1},
+    {label:'Fast', value:0.25},
   ];
   let speedIndex = 0;
+  state.speed = speedModes[speedIndex].value;
+  speedBtn.textContent = 'Speed: ' + speedModes[speedIndex].label;
+
   speedBtn.addEventListener('click', () => {
     speedIndex = (speedIndex + 1) % speedModes.length;
     state.speed = speedModes[speedIndex].value;
