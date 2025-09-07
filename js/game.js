@@ -19,6 +19,14 @@
   const muteBtn = $('#muteBtn');
   const speedBtn = $('#speedBtn');
   const startBtn = $('#startBtn');
+  const leaderboardBtn = $('#leaderboardBtn');
+  const gameOverModal = $('#gameOverModal');
+  const saveScoreBtn = $('#saveScoreBtn');
+  const dismissScoreBtn = $('#dismissScoreBtn');
+  const finalScoreEl = $('#finalScore');
+  const leaderboardModal = $('#leaderboardModal');
+  const closeLeaderboardBtn = $('#closeLeaderboardBtn');
+  const leaderboardList = $('#leaderboardList');
 
   // Dimensions (virtual fixed), canvas is scaled by CSS
   const W = canvas.width, H = canvas.height;
@@ -78,6 +86,33 @@
 
   };
 
+  function getLeaderboard() {
+    return JSON.parse(localStorage.getItem('invaders_leaderboard')||'[]');
+  }
+
+  function saveToLeaderboard(name, score) {
+    const board = getLeaderboard();
+    board.push({name, score});
+    board.sort((a,b) => b.score - a.score);
+    localStorage.setItem('invaders_leaderboard', JSON.stringify(board.slice(0,10)));
+  }
+
+  function renderLeaderboard() {
+    const board = getLeaderboard();
+    leaderboardList.innerHTML = board.length ?
+      board.map(e => `<li>${e.name} - ${e.score}</li>`).join('') :
+      '<li>No scores yet</li>';
+  }
+
+  function showGameOver() {
+    finalScoreEl.textContent = state.score;
+    gameOverModal.classList.remove('hide');
+  }
+
+  function hideGameOver() {
+    gameOverModal.classList.add('hide');
+  }
+
   function rect(a,b) {
     return !(a.x+a.w < b.x || b.x+b.w < a.x || a.y+a.h < b.y || b.y+b.h < a.y);
   }
@@ -127,6 +162,7 @@
     player.inv = 0; player.tri = 0; player.x = W/2;
     spawnShields();
     makeWave(state.level);
+    hideGameOver();
   }
 
   // Drawing helpers
@@ -226,6 +262,17 @@
     state.started = true;
     resumeGame();
   });
+  leaderboardBtn.addEventListener('click', () => {
+    renderLeaderboard();
+    leaderboardModal.classList.remove('hide');
+  });
+  closeLeaderboardBtn.addEventListener('click', () => leaderboardModal.classList.add('hide'));
+  saveScoreBtn.addEventListener('click', () => {
+    const name = prompt('Enter your name:');
+    if (name) saveToLeaderboard(name, state.score);
+    hideGameOver();
+  });
+  dismissScoreBtn.addEventListener('click', () => hideGameOver());
   muteBtn.addEventListener('click', () => { muted = !muted; localStorage.setItem('invaders_muted', JSON.stringify(muted)); setMuteUI(); });
 
   const speedModes = [
@@ -429,6 +476,7 @@
               state.hiScore = state.score;
               localStorage.setItem('invaders_hi', state.hiScore);
             }
+            showGameOver();
           }
           break;
         }
@@ -444,6 +492,7 @@
         pauseBtn.classList.remove('hide');
         resumeBtn.classList.add('hide');
         beep(100,.2,'square',.08);
+        showGameOver();
         break;
       }
     }
