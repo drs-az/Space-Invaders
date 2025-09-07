@@ -88,6 +88,13 @@
       border: 1px solid rgba(255,255,255,.1);
     }
     .hide { display: none !important; }
+    #welcomeModal {
+      position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,.8); z-index: 20;
+    }
+    #welcomeModal .content {
+      background: rgba(15,23,42,.9); padding: 24px; border-radius: 12px; text-align: center;
+    }
     #help {
       position: fixed; top: 56px; right: 16px; max-width: 360px;
       background: rgba(15,23,42,.7); border: 1px solid rgba(255,255,255,.12);
@@ -122,6 +129,14 @@
     <canvas id="game" width="600" height="900" aria-label="Space Invaders game canvas"></canvas>
   </div>
 
+  <div id="welcomeModal" class="hide">
+    <div class="content">
+      <h2>Welcome</h2>
+      <p>Install Space Invaders for the best experience.</p>
+      <button id="installBtn" class="btn">Install</button>
+    </div>
+  </div>
+
   <div id="touch" class="hide" aria-hidden="true">
     <div class="touch-btn" data-action="left">◀︎</div>
     <div class="touch-btn" data-action="fire">▲</div>
@@ -138,6 +153,29 @@
     window.addEventListener('resize', showTouch); showTouch();
   </script>
   <script src="js/game.js"></script>
+  <script>
+    const welcomeModal = document.getElementById('welcomeModal');
+    const installBtn = document.getElementById('installBtn');
+    let deferredPrompt;
+
+    const hideModal = () => welcomeModal.classList.add('hide');
+
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.addEventListener('click', async () => {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') hideModal();
+        deferredPrompt = null;
+      }, { once: true });
+    });
+
+    window.addEventListener('appinstalled', hideModal);
+
+    const installed = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if (installed) hideModal(); else welcomeModal.classList.remove('hide');
+  </script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
