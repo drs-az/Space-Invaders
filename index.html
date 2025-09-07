@@ -88,12 +88,19 @@
       border: 1px solid rgba(255,255,255,.1);
     }
     .hide { display: none !important; }
-    #welcomeModal, #gameOverModal, #leaderboardModal {
+
+    #welcomeModal, #gameOverModal, #leaderboardModal, #saveScoreModal {
       position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
       background: rgba(0,0,0,.8); z-index: 20;
     }
-    #welcomeModal .content, #gameOverModal .content, #leaderboardModal .content {
+    #welcomeModal .content, #gameOverModal .content, #leaderboardModal .content, #saveScoreModal .content {
+
       background: rgba(15,23,42,.9); padding: 24px; border-radius: 12px; text-align: center;
+    }
+    #saveScoreModal input {
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+      padding: 8px 12px; border-radius: 8px; color: var(--fg);
+      width: 100%; box-sizing: border-box;
     }
     #help {
       position: fixed; top: 56px; right: 16px; max-width: 360px;
@@ -152,6 +159,18 @@
       <button id="dismissScoreBtn" class="btn secondary">No</button>
     </div>
   </div>
+
+  <div id="saveScoreModal" class="hide">
+    <div class="content">
+      <h2>Enter Name</h2>
+      <input id="playerNameInput" type="text" placeholder="Your name" />
+      <div style="margin-top:16px; display:flex; gap:12px; justify-content:center;">
+        <button id="submitNameBtn" class="btn">Save</button>
+        <button id="cancelNameBtn" class="btn secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
 
   <div id="leaderboardModal" class="hide">
     <div class="content">

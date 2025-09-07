@@ -28,6 +28,12 @@
   const closeLeaderboardBtn = $('#closeLeaderboardBtn');
   const leaderboardList = $('#leaderboardList');
 
+  const saveScoreModal = $('#saveScoreModal');
+  const playerNameInput = $('#playerNameInput');
+  const submitNameBtn = $('#submitNameBtn');
+  const cancelNameBtn = $('#cancelNameBtn');
+
+
   // Dimensions (virtual fixed), canvas is scaled by CSS
   const W = canvas.width, H = canvas.height;
 
@@ -268,10 +274,23 @@
   });
   closeLeaderboardBtn.addEventListener('click', () => leaderboardModal.classList.add('hide'));
   saveScoreBtn.addEventListener('click', () => {
-    const name = prompt('Enter your name:');
-    if (name) saveToLeaderboard(name, state.score);
+
     hideGameOver();
+    playerNameInput.value = '';
+    saveScoreModal.classList.remove('hide');
+    playerNameInput.focus();
   });
+  submitNameBtn.addEventListener('click', () => {
+    const name = playerNameInput.value.trim();
+    if (name) {
+      saveToLeaderboard(name, state.score);
+      renderLeaderboard();
+    }
+    saveScoreModal.classList.add('hide');
+  });
+  cancelNameBtn.addEventListener('click', () => saveScoreModal.classList.add('hide'));
+  playerNameInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitNameBtn.click(); });
+
   dismissScoreBtn.addEventListener('click', () => hideGameOver());
   muteBtn.addEventListener('click', () => { muted = !muted; localStorage.setItem('invaders_muted', JSON.stringify(muted)); setMuteUI(); });
 
