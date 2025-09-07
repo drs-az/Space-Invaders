@@ -238,6 +238,7 @@
     if (player.tri>0) {
       bullets.push({x:bx-14, y:by, w:4, h:14, vy:-60, vx:-18, enemy:false});
       bullets.push({x:bx+14, y:by, w:4, h:14, vy:-60, vx:18, enemy:false});
+
     }
     state.bullets.push(...bullets);
     state.cooldown = player.tri>0 ? 10 : 12;
