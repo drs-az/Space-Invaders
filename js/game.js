@@ -17,6 +17,7 @@
   const pauseBtn = $('#pauseBtn');
   const muteBtn = $('#muteBtn');
   const speedBtn = $('#speedBtn');
+  const startBtn = $('#startBtn');
 
   // Dimensions (virtual fixed), canvas is scaled by CSS
   const W = canvas.width, H = canvas.height;
@@ -42,7 +43,7 @@
 
   // Game state
   const state = {
-    playing: true,
+    playing: false,
     level: 1,
     score: 0,
     lives: 3,
@@ -71,7 +72,7 @@
   // Entities
   const player = {
 
-    x: W/2, y: H-80, w: 48, h: 20, speed: 3, inv: 0, tri: 0
+    x: W/2, y: H-80, w: 48, h: 20, speed: 48, inv: 0, tri: 0
 
   };
 
@@ -207,6 +208,13 @@
   touch.addEventListener('pointercancel', () => state.touch = {left:false,right:false,fire:false});
 
   pauseBtn.addEventListener('click', () => togglePause());
+  startBtn.addEventListener('click', () => {
+    resetGame();
+    state.playing = true;
+    startBtn.classList.add('hide');
+    pauseBtn.classList.remove('hide');
+    pauseBtn.textContent = 'Pause';
+  });
   muteBtn.addEventListener('click', () => { muted = !muted; localStorage.setItem('invaders_muted', JSON.stringify(muted)); setMuteUI(); });
 
   const speedModes = [
@@ -234,13 +242,13 @@
     if (state.cooldown > 0) return;
     const bx = player.x + player.w/2 - 2, by = player.y - 14;
 
-    const bullets = [{x:bx, y:by, w:4, h:14, vy:-6, enemy:false}];
+    const bullets = [{x:bx, y:by, w:4, h:14, vy:-60, enemy:false}];
     if (player.tri>0) {
-      bullets.push({x:bx-14, y:by, w:4, h:14, vy:-6, vx:-1.8, enemy:false});
-      bullets.push({x:bx+14, y:by, w:4, h:14, vy:-6, vx:1.8, enemy:false});
+      bullets.push({x:bx-14, y:by, w:4, h:14, vy:-60, vx:-18, enemy:false});
+      bullets.push({x:bx+14, y:by, w:4, h:14, vy:-60, vx:18, enemy:false});
     }
     state.bullets.push(...bullets);
-    state.cooldown = player.tri>0 ? 20 : 24;
+    state.cooldown = player.tri>0 ? 0.5 : 0.6;
 
     beep(880, .05, 'square', .04);
   }
@@ -275,6 +283,8 @@
 
   // Init
   resetGame();
+  state.playing = false;
+  pauseBtn.classList.add('hide');
 
   // Main loop
   let last = 0;
@@ -367,6 +377,19 @@
     }
     state.bullets = state.bullets.filter(b => !b._dead);
     state.eBullets = state.eBullets.filter(b => !b._dead);
+    state.shields = state.shields.filter(s => s.hp>0);
+
+    // enemies vs shields
+    for (const e of state.enemies) {
+      for (const s of state.shields) {
+        if (s.hp>0 && rect(e, s)) {
+          s.hp = 0;
+          e._dead = true;
+          explode(e.x + e.w/2, e.y + e.h/2, '#f472b6', 20, 2);
+        }
+      }
+    }
+    state.enemies = state.enemies.filter(e => !e._dead);
     state.shields = state.shields.filter(s => s.hp>0);
 
     // enemy bullets vs player
