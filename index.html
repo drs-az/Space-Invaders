@@ -40,11 +40,12 @@
     }
     .brand img { width: 28px; height: 28px; }
     .hud {
-      display: inline-flex; flex-wrap: wrap; gap: 16px; row-gap: 6px;
+      display: flex; flex-wrap: wrap; gap: 16px; row-gap: 6px;
       align-items: center; justify-content: center;
       font-weight: 600;
       background: rgba(255,255,255,.05);
       padding: 6px 10px; border-radius: 999px; backdrop-filter: blur(6px);
+      max-width: 100%;
     }
     @media (max-width: 600px) {
       header { justify-content: center; }
@@ -107,6 +108,7 @@
       <div>Lives: <span id="lives">3</span></div>
       <div>Level: <span id="level">1</span></div>
       <button class="btn secondary" id="muteBtn" aria-label="Toggle sound">🔊</button>
+      <button class="btn secondary" id="speedBtn">Speed: Slow</button>
       <button class="btn" id="pauseBtn">Pause</button>
     </div>
   </header>
